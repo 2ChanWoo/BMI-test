@@ -12,6 +12,8 @@ class _BmiMainState extends State<BmiMain> {
 
   final _heightController = TextEditingController();
   final _weightController = TextEditingController();
+  final FocusNode _heightFocus = FocusNode();
+  final FocusNode _weightFocus = FocusNode();
 
   @override
   void dispose() {
@@ -43,6 +45,11 @@ class _BmiMainState extends State<BmiMain> {
                   }
                   return null;
                 },
+                focusNode: _heightFocus,
+                textInputAction: TextInputAction.next,
+                onFieldSubmitted: (term) {
+                  _fieldFocusChange(context, _heightFocus, _weightFocus);
+                },
               ),
               SizedBox(
                 height: 16.0,
@@ -59,6 +66,22 @@ class _BmiMainState extends State<BmiMain> {
                     return '몸무게를 입력해 주세요';
                   }
                   return null;
+                },
+                focusNode: _weightFocus,
+                textInputAction: TextInputAction.go,
+                onFieldSubmitted: (term) {
+                  /* go 말고 done은?? 버튼의 onPressed를 복붙했는데, >> focusNode처럼 간편한 방법은 없을까? << */
+                  ////////////////////////////////////////////////////////////////////
+                  if (_formKey.currentState.validate()) {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => BmiResult(
+                              double.parse(_heightController.text.trim()),
+                              double.parse(_weightController.text.trim()))),
+                    );
+                  }
+                  /////////////////////////////////////////////////////////////
                 },
               ),
               Container(
@@ -87,3 +110,7 @@ class _BmiMainState extends State<BmiMain> {
   }
 }
 
+_fieldFocusChange(BuildContext context, FocusNode currentFocus,FocusNode nextFocus) {
+  currentFocus.unfocus();
+  FocusScope.of(context).requestFocus(nextFocus);
+}
